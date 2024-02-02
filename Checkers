@@ -45,3 +45,21 @@ def make_move(board, player, start, end):
     board[x1][y1] = " "
     if abs(x2 - x1) == 2:
         board[(x1 + x2) // 2][(y1 + y2) // 2] = " "
+
+def main():
+    board = initialize_board()
+    player = "B"
+    while True:
+        print_board(board)
+        print(f"Player {player}'s turn")
+        start = tuple(map(int, input("Enter the starting position (row, col): ").split()))
+        end = tuple(map(int, input("Enter the ending position (row, col): ").split()))
+
+        if is_valid_move(board, player, start, end):
+            make_move(board, player, start, end)
+            player = "W" if player == "B" else "B"
+        else:
+            print("Invalid move. Try again.")
+
+if __name__ == "__main__":
+    main()
