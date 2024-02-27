@@ -14,6 +14,7 @@ def initialize_board():
             board[i][2] = "B"
             board[i][6] = "W"
     return board
+
 def is_valid_move(board, player, start, end):
     x1, y1 = start
     x2, y2 = end
@@ -42,14 +43,23 @@ def make_move(board, player, start, end):
     x2, y2 = end
 
     board[x2][y2] = board[x1][y1]
+
+    # Crown kings
+    if (player == "B" and x2 == 0) or (player == "W" and x2 == 7):
+        board[x2][y2] = board[x2][y2].upper()
+
     board[x1][y1] = " "
     if abs(x2 - x1) == 2:
         board[(x1 + x2) // 2][(y1 + y2) // 2] = " "
 
+def is_winner(board):
+    return "B" not in [piece for row in board for piece in row] or "W" not in [piece for row in board for piece in row]
+
 def main():
     board = initialize_board()
     player = "B"
-    while True:
+
+    while not is_winner(board):
         print_board(board)
         print(f"Player {player}'s turn")
         start = tuple(map(int, input("Enter the starting position (row, col): ").split()))
@@ -60,6 +70,8 @@ def main():
             player = "W" if player == "B" else "B"
         else:
             print("Invalid move. Try again.")
+
+    print(f"Player {player} wins!")
 
 if __name__ == "__main__":
     main()
