@@ -30,10 +30,18 @@ def is_valid_move(board, player, start, end):
             return True
         if abs(x2 - x1) == 2 and (y2 - y1 == 2) and board[(x1 + x2) // 2][(y1 + y2) // 2] == "W":
             return True
+        if board[x1][y1] == "BK" and abs(x2 - x1) == 1 and abs(y2 - y1) == 1:
+            return True
+        if board[x1][y1] == "BK" and abs(x2 - x1) == 2 and abs(y2 - y1) == 2 and board[(x1 + x2) // 2][(y1 + y2) // 2] == "W":
+            return True
     elif player == "W":
         if abs(x2 - x1) == 1 and (y2 - y1 == -1):
             return True
         if abs(x2 - x1) == 2 and (y2 - y1 == -2) and board[(x1 + x2) // 2][(y1 + y2) // 2] == "B":
+            return True
+        if board[x1][y1] == "WK" and abs(x2 - x1) == 1 and abs(y2 - y1) == 1:
+            return True
+        if board[x1][y1] == "WK" and abs(x2 - x1) == 2 and abs(y2 - y1) == 2 and board[(x1 + x2) // 2][(y1 + y2) // 2] == "B":
             return True
 
     return False
@@ -43,23 +51,26 @@ def make_move(board, player, start, end):
     x2, y2 = end
 
     board[x2][y2] = board[x1][y1]
-
-    # Crown kings
-    if (player == "B" and x2 == 0) or (player == "W" and x2 == 7):
-        board[x2][y2] = board[x2][y2].upper()
-
     board[x1][y1] = " "
     if abs(x2 - x1) == 2:
         board[(x1 + x2) // 2][(y1 + y2) // 2] = " "
 
-def is_winner(board):
-    return "B" not in [piece for row in board for piece in row] or "W" not in [piece for row in board for piece in row]
+def promote_kings(board):
+    for i in range(8):
+        if board[0][i] == "W":
+            board[0][i] = "WK"
+        if board[7][i] == "B":
+            board[7][i] = "BK"
+
+def is_game_over(board):
+    black_count = sum(row.count("B") + row.count("BK") for row in board)
+    white_count = sum(row.count("W") + row.count("WK") for row in board)
+    return black_count == 0 or white_count == 0
 
 def main():
     board = initialize_board()
     player = "B"
-
-    while not is_winner(board):
+    while not is_game_over(board):
         print_board(board)
         print(f"Player {player}'s turn")
         start = tuple(map(int, input("Enter the starting position (row, col): ").split()))
@@ -67,11 +78,12 @@ def main():
 
         if is_valid_move(board, player, start, end):
             make_move(board, player, start, end)
+            promote_kings(board)
             player = "W" if player == "B" else "B"
         else:
             print("Invalid move. Try again.")
 
-    print(f"Player {player} wins!")
+    print("Game over!")
 
 if __name__ == "__main__":
     main()
